@@ -1,0 +1,148 @@
+=====================================================================
+ PULSE MUSIC PLAYER — ALGORITHMS (6th semester project / viva notes)
+=====================================================================
+
+Yo project ma 8 wota algorithm chha. Sabai real feature ma use bhaeko chha,
+sudhai dekhauna sakinchha.
+
+---------------------------------------------------------------------
+1. COLLABORATIVE FILTERING + JACCARD SIMILARITY   (Recommendation)
+---------------------------------------------------------------------
+File     : algorithms.php  -> recommend_songs()   (api.php: action=recommend)
+Kaha dekhinchha : Home page -> "Recommended for you"
+Idea     : Tapai jasto taste bhayeka aru users le like gareko song, jun tapai le
+           like gareko chhaina, tyo recommend garne.
+Steps    : 1) har user ko liked songs ko set
+           2) Jaccard similarity:  J(A,B) = |A ∩ B| / |A ∪ B|
+           3) similar user ko song ma similarity thapera score
+           4) highest score pahila
+Cold start: kei like gareko chhaina bhane popular (most liked) songs dekhaune.
+Complexity: O(U x L)   (U = users, L = ave likes per user)
+
+DEMO: 2-3 wota user banaunus. Dui user le same 2-3 song like garnus, ek user le
+      ek extra song like garnus. Arko user ko Home ma tyo extra song
+      "Recommended" ma aauchha.
+
+---------------------------------------------------------------------
+2. LEVENSHTEIN DISTANCE (Dynamic Programming)   (Fuzzy / typo search)
+---------------------------------------------------------------------
+File     : js/algorithms.js -> levenshtein(), fuzzyScore(), fuzzySearch()
+Kaha dekhinchha : Search box (Home, Liked, Playlist ma)
+Idea     : Dui string bich minimum insert/delete/replace kati chha. "kitten" ->
+           "sitting" = 3. Isle garda "blindng" lekhda pani "Blinding Glow" bhetinchha.
+Ranking  : starts-with (-1) > contains (0) > typo distance (1,2,...)
+Complexity: O(m x n) time, hamle 2 rows matra rakheko le space O(n)
+
+DEMO: Search ma "blindng" ya "resam" jasto galat spelling lekhnus.
+
+---------------------------------------------------------------------
+3. MERGE SORT   (Sorting)
+---------------------------------------------------------------------
+File     : js/algorithms.js -> mergeSort()
+Kaha dekhinchha : Title ko dropdown ("Sort: Newest / Title A-Z / Z-A / Artist A-Z")
+                  ra fuzzy search ko ranking ma pani
+Idea     : Divide (aadha garne) -> Conquer (sort garne) -> Combine (merge garne)
+Property : Stable (barabar elements ko order change hudaina)
+Complexity: O(n log n) best/average/worst sabai ma, Space O(n)
+
+---------------------------------------------------------------------
+4. FISHER-YATES SHUFFLE   (Fair shuffle)
+---------------------------------------------------------------------
+File     : js/algorithms.js -> fisherYates()   (js/app.js: startQueue, shuffle button)
+Kaha dekhinchha : Player ko Shuffle button
+Idea     : Pachhi bata suru garera har position ma random swap. Har order ko
+           probability barabar ra kunai song repeat hudaina (sabai baji sakepachhi
+           matra naya round).
+Complexity: O(n) time. (Math.random() bata sort garne tarika biased hunchha.)
+
+---------------------------------------------------------------------
+5. TRIE (Prefix Tree)   (Autocomplete)
+---------------------------------------------------------------------
+File     : js/algorithms.js -> class Trie, buildTrie()   (js/app.js: showSugg)
+Kaha dekhinchha : Search box ma type garda tala suggestions aauchhan
+Idea     : Har character ek node. "bl" lekhda "Blinding..", "Blue.." jasta words
+           tyo prefix ko tala bata afai bhetinchha.
+Complexity: insert O(L), suggest O(L + results)   (L = word ko length)
+
+DEMO: Search ma 2 akshyar lekhnus, suggestions dropdown aauchha.
+
+---------------------------------------------------------------------
+6. BINARY SEARCH (Lower bound)   (A-Z jump)
+---------------------------------------------------------------------
+File     : js/algorithms.js -> lowerBound()   (js/app.js: firstIndexOf, azBar)
+Kaha dekhinchha : "Sort: Title A-Z" select garda A-Z buttons aauchhan. "M" thichda
+                  M bata suru hune pahilo song ma jump garchha.
+Idea     : Sorted list ko bich herne, tyo letter bhanda sano bhaye dahine,
+           nabhaye bayen — har step ma aadha khojne ठाउँ hatchha.
+           (Isai le gara songs nabhayeko letter dim dekhinchha.)
+Complexity: O(log n)   (linear search O(n))
+Note     : Binary search sorted data ma matra kaam garchha, tesaile yo Merge Sort
+           pachhi use bhaeko chha.
+
+---------------------------------------------------------------------
+7. LRU CACHE (Least Recently Used)   (Cache / History)
+---------------------------------------------------------------------
+File     : js/algorithms.js -> class LRUCache   (js/app.js: recent, searchCache)
+Kaha dekhinchha : 1) Home ko "Recently played" (last 8 songs)
+                  2) Discover Online ma pahila khojeko search feri khoj da
+                     internet call hudaina, cache bata turuntai aauchha
+Idea     : Cache bhari bhayo bhane sabai bhanda purano use bhayeko hatayera
+           naya halne. Map le insertion order yaad rakhchha.
+Complexity: get / set dubai O(1)
+
+DEMO: Discover ma "love" khojnus, arko kei khojnus, feri "love" khojnus — turuntai aauchha.
+
+---------------------------------------------------------------------
+8. MIN-HEAP (Top-K)   (Top charts)
+---------------------------------------------------------------------
+File     : algorithms.php -> class MinHeap, top_k_ids(), top_k_songs()
+Kaha dekhinchha : Home ko "Top charts" ra Admin Dashboard ko "Top 5 most liked songs"
+Idea     : Size K ko min-heap. Naya song ko likes root bhanda dherai bhaye root
+           hatayera halne. Sabai sort garnu pardaina.
+Complexity: O(n log K)  (sort: O(n log n))
+Heap     : array ma complete binary tree, parent = (i-1)/2, kids = 2i+1, 2i+2
+
+DEMO: Kehi users le songs like garnus, Home ma Top charts aauchha (like nabhaye khali).
+
+---------------------------------------------------------------------
+ VIVA MA SODHNE SAMBHAVIT PRASHNA
+---------------------------------------------------------------------
+Q: Merge sort kina, quick sort kina haina?
+A: Merge sort ko worst case pani O(n log n) chha ra stable chha, tesaile
+   title same bhaye artist ko order bigdaina.
+
+Q: Jaccard similarity kina, cosine kina haina?
+A: Likes yes/no (binary) data ho, tesaile set-based Jaccard sajilo ra thik chha.
+   Rating (1-5) bhaye cosine similarity.
+
+Q: Collaborative filtering ko limitation?
+A: Cold start problem (naya user/song) — hamle popular songs le handle gareko.
+   Users kam bhaye recommendation weak hunchha.
+
+Q: Levenshtein ko time complexity?
+A: O(m x n). Hamle query chhoto hune ra songs kam hune le fast chha.
+
+Q: Shuffle ma Math.random() le sort kina nagareko?
+A: Sort-based shuffle biased hunchha. Fisher-Yates ma sabai permutation
+   equally likely hunchha.
+
+Q: Trie kina, normal list search kina haina?
+A: Trie ma prefix khojna word ko length (L) jati matra lagchha, songs kati dherai
+   bhaye pani. List ma har choti sabai song herna parthyo.
+
+Q: Binary search ko condition k ho?
+A: Data sorted hunuparchha. Hamle pahila Merge Sort gareko le yo kaam garchha.
+
+Q: LRU cache kina chaiyo?
+A: Purano search feri garda internet call bachauna ra recently played yaad rakhna.
+   Limited memory ma sabai bhanda kam use bhayeko hataune policy ho.
+
+Q: Heap le Top-K kina, sort kina haina?
+A: Sort O(n log n), heap O(n log K). K sano ra n dherai bhaye heap tez hunchha.
+
+---------------------------------------------------------------------
+ THAP GARNA SAKINE (sir le aru maganu bhayo bhane)
+---------------------------------------------------------------------
+- Queue / linked list: play queue
+- Graph (BFS): similar artists / songs ko network
+- Dijkstra jastai: yo project ma natural fit chhaina
